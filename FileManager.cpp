@@ -3,8 +3,13 @@
 #include "Log.h"
 #include "Stringify.h"
 
+#ifndef _WIN32
 #include <sys/param.h>
 #include <dirent.h>
+#else
+#include <Windows.h>
+#include "Extern/dirent.h"
+#endif
 #include <stdio.h>
 
 //=============================================================================
@@ -103,6 +108,9 @@ std::string FileManager::GetCWD() {
 	#ifdef __APPLE__
 		NSString* ResourcePath = [[NSBundle mainBundle] resourcePath];
 		CWD = [ResourcePath cStringUsingEncoding:1];
+	#elif defined(_WIN32)
+		char buffer[MAX_PATH];
+		cwd = ((GetCurrentDirectory(MAX_PATH, buffer) > 0) ? std::string(buffer) : std::string(""));
 	#else
 		char Buffer[MAXPATHLEN];
 		CWD = (getcwd(Buffer, MAXPATHLEN) ? std::string(Buffer) : std::string(""));
