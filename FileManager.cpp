@@ -8,7 +8,6 @@
 #include <dirent.h>
 #else
 #include <Windows.h>
-#include "Extern/dirent.h"
 #endif
 #include <stdio.h>
 
@@ -74,6 +73,27 @@ std::vector<std::string> FileManager::GetFilesInFolder(std::string Folder) {
 			std::string Filename = Path + DIR_SEPARATOR + [File cStringUsingEncoding:1];
 
 			List.push_back(Filename);
+		}
+	#elif _WIN32
+		HANDLE dirHandle = NULL;
+		WIN32_FIND_DATA FileHandle;
+		std::string winPath(path + DIR_SEPARATOR + std::string("*"));
+		if ((dirHandle = FindFirstFile(winPath.c_str(), &FileHandle)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				if (std::string(FileHandle.cFileName) == ".") continue;
+				if (std::string(FileHandle.cFileName) == "..") continue;
+
+				std::string Filename = path + DIR_SEPARATOR + FileHandle.cFileName;
+
+				list.push_back(Filename);
+			} while (FindNextFile(dirHandle, &FileHandle) != false);
+			FindClose(dirHandle);
+		}
+		else
+		{
+			Log("Unable to open directory: %s", path.c_str());
 		}
 	#else
         DIR* DirHandle = NULL;
