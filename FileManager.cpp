@@ -110,7 +110,7 @@ std::string FileManager::GetCWD() {
 		CWD = [ResourcePath cStringUsingEncoding:1];
 	#elif defined(_WIN32)
 		char buffer[MAX_PATH];
-		cwd = ((GetCurrentDirectory(MAX_PATH, buffer) > 0) ? std::string(buffer) : std::string(""));
+		CWD = ((GetCurrentDirectory(MAX_PATH, buffer) > 0) ? std::string(buffer) : std::string(""));
 	#else
 		char Buffer[MAXPATHLEN];
 		CWD = (getcwd(Buffer, MAXPATHLEN) ? std::string(Buffer) : std::string(""));
