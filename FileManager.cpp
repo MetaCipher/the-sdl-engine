@@ -77,7 +77,7 @@ std::vector<std::string> FileManager::GetFilesInFolder(std::string Folder) {
 	#elif _WIN32
 		HANDLE dirHandle = NULL;
 		WIN32_FIND_DATA FileHandle;
-		std::string winPath(path + DIR_SEPARATOR + std::string("*"));
+		std::string winPath(Path + DIR_SEPARATOR + std::string("*"));
 		if ((dirHandle = FindFirstFile(winPath.c_str(), &FileHandle)) != INVALID_HANDLE_VALUE)
 		{
 			do
@@ -85,15 +85,15 @@ std::vector<std::string> FileManager::GetFilesInFolder(std::string Folder) {
 				if (std::string(FileHandle.cFileName) == ".") continue;
 				if (std::string(FileHandle.cFileName) == "..") continue;
 
-				std::string Filename = path + DIR_SEPARATOR + FileHandle.cFileName;
+				std::string Filename = Path + DIR_SEPARATOR + FileHandle.cFileName;
 
-				list.push_back(Filename);
+				List.push_back(Filename);
 			} while (FindNextFile(dirHandle, &FileHandle) != false);
 			FindClose(dirHandle);
 		}
 		else
 		{
-			Log("Unable to open directory: %s", path.c_str());
+			Log("Unable to open directory: %s", Path.c_str());
 		}
 	#else
         DIR* DirHandle = NULL;
