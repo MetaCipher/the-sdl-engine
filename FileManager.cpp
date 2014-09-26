@@ -3,8 +3,12 @@
 #include "Log.h"
 #include "Stringify.h"
 
+#ifndef _WIN32
 #include <sys/param.h>
 #include <dirent.h>
+#else
+#include <Windows.h>
+#endif
 #include <stdio.h>
 
 //=============================================================================
@@ -70,6 +74,27 @@ std::vector<std::string> FileManager::GetFilesInFolder(std::string Folder) {
 
 			List.push_back(Filename);
 		}
+	#elif _WIN32
+		HANDLE dirHandle = NULL;
+		WIN32_FIND_DATA FileHandle;
+		std::string winPath(Path + DIR_SEPARATOR + std::string("*"));
+		if ((dirHandle = FindFirstFile(winPath.c_str(), &FileHandle)) != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				if (std::string(FileHandle.cFileName) == ".") continue;
+				if (std::string(FileHandle.cFileName) == "..") continue;
+
+				std::string Filename = Path + DIR_SEPARATOR + FileHandle.cFileName;
+
+				List.push_back(Filename);
+			} while (FindNextFile(dirHandle, &FileHandle) != false);
+			FindClose(dirHandle);
+		}
+		else
+		{
+			Log("Unable to open directory: %s", Path.c_str());
+		}
 	#else
         DIR* DirHandle = NULL;
         dirent* FileHandle = NULL;
@@ -103,6 +128,9 @@ std::string FileManager::GetCWD() {
 	#ifdef __APPLE__
 		NSString* ResourcePath = [[NSBundle mainBundle] resourcePath];
 		CWD = [ResourcePath cStringUsingEncoding:1];
+	#elif defined(_WIN32)
+		char buffer[MAX_PATH];
+		CWD = ((GetCurrentDirectory(MAX_PATH, buffer) > 0) ? std::string(buffer) : std::string(""));
 	#else
 		char Buffer[MAXPATHLEN];
 		CWD = (getcwd(Buffer, MAXPATHLEN) ? std::string(Buffer) : std::string(""));
