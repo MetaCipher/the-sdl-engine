@@ -23,7 +23,7 @@ bool TextureBank::Init() {
         // Skip all non-png files
         if(Ext != "png") continue;
 
-		//Log("Add Texture : ID = %s : Filename = %s : Ext = %s", ID.c_str(), Filename.c_str(), Ext.c_str());
+		Log("Add Texture : ID = %s : Filename = %s : Ext = %s", ID.c_str(), Filename.c_str(), Ext.c_str());
 		AddTexture(Renderer, ID, Filename);
 	}
 

@@ -11,10 +11,15 @@
 	#define __APP_H__
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "TextureBank.h"
 
-class App {
+#include "CAppStateManager.h"
+
+#include "CEvent.h"
+
+class App : public CEvent {
 	private:
 		static App Instance;
 
@@ -24,8 +29,8 @@ class App {
 		SDL_Renderer* Renderer = NULL;
 		SDL_Surface* PrimarySurface = NULL;
 
-		static const int WindowWidth = 1024;
-		static const int WindowHeight = 768;
+		static const int WindowWidth = 760;
+		static const int WindowHeight = 440;
 
 		Texture* TestTexture;
 
@@ -34,6 +39,7 @@ class App {
 
 		// Capture SDL Events
 		void OnEvent(SDL_Event* Event);
+            void OnExit();
 
 		// Initialize our SDL game / app
 		bool Init();
