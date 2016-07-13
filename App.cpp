@@ -10,6 +10,9 @@ App::App() {
 
 //------------------------------------------------------------------------------
 void App::OnEvent(SDL_Event* Event) {
+    CAppStateManager::OnEvent(Event);
+
+    CEvent::OnEvent(Event);
 }
 
 //------------------------------------------------------------------------------
@@ -19,12 +22,17 @@ bool App::Init() {
 		return false;
 	}
 
+	if (TTF_Init() < 0) {
+        Log("Couldn't initialize SDL_ttf: %s\n", SDL_GetError());
+        return false;
+    }
+
 	if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
 		Log("Unable to Init hinting: %s", SDL_GetError());
 	}
 
 	if((Window = SDL_CreateWindow(
-		"My SDL Game",
+		"Tetris",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 		WindowWidth, WindowHeight, SDL_WINDOW_SHOWN)
 	) == NULL) {
@@ -53,24 +61,43 @@ bool App::Init() {
 		return false;
 	}
 
+	CAppStateManager::SetActiveAppState(APPSTATE_INTRO);
+
 	return true;
 }
 
 //------------------------------------------------------------------------------
 void App::Loop() {
+    CAppStateManager::OnLoop();
+
+    if(CAppStateManager::GetActiveAppState() == NULL) {
+        OnExit();
+    }
 }
 
 //------------------------------------------------------------------------------
 void App::Render() {
 	SDL_RenderClear(Renderer);
 
-	TextureBank::Get("Test")->Render(0, 0); // You should really check your pointers
+//	SDL_Rect Rect;
+//    Rect.x = 0;
+//    Rect.y = 0;
+//    Rect.w = 100;
+//    Rect.h = 100;
+//    SDL_SetRenderDrawColor(Renderer, 100, 0, 0, 0);
+//    SDL_RenderFillRect(Renderer, &Rect);
+
+    CAppStateManager::OnRender();
+
+//	TextureBank::Get("tex1")->Render(0, 0); // You should really check your pointers
 
 	SDL_RenderPresent(Renderer);
 }
 
 //------------------------------------------------------------------------------
 void App::Cleanup() {
+    CAppStateManager::SetActiveAppState(APPSTATE_NONE);
+
 	TextureBank::Cleanup();
 
 	if(Renderer) {
@@ -97,7 +124,7 @@ int App::Execute(int argc, char* argv[]) {
 		while(SDL_PollEvent(&Event) != 0) {
 			OnEvent(&Event);
 
-			if(Event.type == SDL_QUIT) Running = false;
+//			if(Event.type == SDL_QUIT) Running = false;
 		}
 
 		Loop();
@@ -110,7 +137,10 @@ int App::Execute(int argc, char* argv[]) {
 
 	return 1;
 }
-
+//------------------------------------------------------------------------------
+void App::OnExit() {
+    Running = false;
+}
 //==============================================================================
 SDL_Renderer* App::GetRenderer() { return Renderer; }
 

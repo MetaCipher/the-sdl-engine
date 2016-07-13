@@ -107,7 +107,7 @@ std::vector<std::string> FileManager::GetFilesInFolder(std::string Folder) {
 
                 std::string Filename = Path + DIR_SEPARATOR + FileHandle->d_name;
 
-                //Log("Found File: %s", Filename.c_str());
+                Log("Found File: %s", Filename.c_str());
 
                 List.push_back(Filename);
             }
